@@ -1,6 +1,8 @@
 (emacs-init-time)
 (setq inhibit-startup-message t)
-;(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
 (global-hl-line-mode t)
 (line-number-mode t)
 (visual-line-mode t)
@@ -41,7 +43,9 @@
 (use-package evil
 	     :ensure t
 	     :init
+             (setq evil-undo-system 'undo-fu)
 	     (evil-mode t))
+(use-package undo-fu)
 (use-package spacemacs-common
     :ensure spacemacs-theme
     :config (load-theme 'spacemacs-dark t))
@@ -97,7 +101,7 @@
      :files (:defaults "languageserver")))
 (use-package lsp-mode
 	     :hook
-             ((sh-mode . lsp))
+;             ((sh-mode . lsp))
 	     ((lsp-mode . lsp-enable-which-key-integration))
 	     :commands lsp)
 (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
