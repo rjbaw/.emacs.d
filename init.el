@@ -40,12 +40,14 @@
 	     :quelpa (spinner
 		       :fetcher github
 		       :repo "Malabarba/spinner.el"))
+(setq evil-want-C-i-jump nil)
 (use-package evil
 	     :ensure t
 	     :init
              (setq evil-undo-system 'undo-fu)
 	     (evil-mode t))
 (use-package undo-fu)
+(use-package rust-mode)
 (use-package spacemacs-common
     :ensure spacemacs-theme
     :config (load-theme 'spacemacs-dark t))
