@@ -16,7 +16,7 @@ echo "alias em='emacsclient -t -nw -a \"\"'" >> ~/.bashrc
 ## Packages
 `evil-mode`  
 `company-mode`  
-`magit`__
+`magit`  
 `lsp-mode`  
 `yasnippet`  
 `dap-mode`  
