@@ -46,8 +46,12 @@
 	     :init
              (setq evil-undo-system 'undo-fu)
 	     (evil-mode t))
+(setq-default evil-escape-key-sequence "<ESC>")
 (use-package undo-fu)
 (use-package rust-mode)
+(use-package go-mode)
+(use-package dockerfile-mode)
+(use-package docker-compose-mode)
 (use-package spacemacs-common
     :ensure spacemacs-theme
     :config (load-theme 'spacemacs-dark t))
