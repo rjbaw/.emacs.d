@@ -3,6 +3,17 @@ A compilation of random emacs lisp snippets around the web
 
 ![Alt text](sample.png?raw=true "Preview")
 
+## Setup
+```
+cd ~/
+git clone https://github.com/rjbaw/.emacs.d.git
+emacs
+```
+
+## Requirements
+- Linux  
+- Emacs 26.3+  
+
 ## Deploying Emacs as Server
 ### GUI Option
 ```
@@ -22,7 +33,6 @@ echo "alias em='emacsclient -t -nw -a \"\"'" >> ~/.bashrc
 `dap-mode`  
 `which-key`  
 `vimish-fold`  
-`lsp-julia`  
 
 ## Themes
 `spacemacs-theme`  

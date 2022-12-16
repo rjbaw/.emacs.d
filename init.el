@@ -1,5 +1,6 @@
 (emacs-init-time)
 (setq inhibit-startup-message t)
+(setq visible-bell 1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 ;(scroll-bar-mode -1)
@@ -8,8 +9,8 @@
 (visual-line-mode t)
 (setq-default indent-tabs-mode nil)
 
+(setq default-frame-alist '((font . "DM Mono")))
 (setq custom-file "~/.emacs.d/custom-file.el")
-;(load-file custom-file)
 
 (setq exec-path (append exec-path '("/usr/bin")))
 (require 'package)
@@ -45,7 +46,15 @@
 	     :ensure t
 	     :init
              (setq evil-undo-system 'undo-fu)
+             (setq evil-want-integration t)
+             (setq evil-want-keybinding nil)
+             :config
 	     (evil-mode t))
+(use-package evil-collections
+	     :after evil
+	     :config
+	     :ensure t
+	     (evil-collection-init))
 (setq-default evil-escape-key-sequence "<ESC>")
 (use-package undo-fu)
 (use-package rust-mode)
@@ -118,4 +127,4 @@
   ;; :project/:workspace/:file
   (setq lsp-diagnostics-modeline-scope :project)
   (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
-
+(lsp-mode t)
