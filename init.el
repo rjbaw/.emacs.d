@@ -50,11 +50,11 @@
              (setq evil-want-keybinding nil)
              :config
 	     (evil-mode t))
-(use-package evil-collections
+(use-package evil-collection
 	     :after evil
 	     :config
-	     :ensure t
-	     (evil-collection-init))
+	     (evil-collection-init)
+	     :ensure t)
 (setq-default evil-escape-key-sequence "<ESC>")
 (use-package undo-fu)
 (use-package rust-mode)
