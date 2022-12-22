@@ -56,8 +56,14 @@
 	     (evil-collection-init)
 	     :ensure t)
 (setq-default evil-escape-key-sequence "<ESC>")
+(use-package org
+            :ensure t)
+(use-package org-bullets
+            :config
+            (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 (use-package undo-fu)
 (use-package rust-mode)
+(use-package julia-mode)
 (use-package go-mode)
 (use-package dockerfile-mode)
 (use-package docker-compose-mode)
@@ -66,19 +72,38 @@
     :config (load-theme 'spacemacs-dark t))
 (use-package magit
 	     :ensure t)
+(use-package lsp-mode
+             :init (setq lsp-keymap-prefix "C-c l")
+	     :hook
+             (
+              (sh-mode . lsp)
+              (lsp-mode . lsp-enable-which-key-integration)
+              )
+	     :commands (lsp lsp-deferred)
+             :ensure t)
 (use-package lsp-ui
 	     :quelpa (lsp-ui
 		       :fetcher github
 		       :repo "emacs-lsp/lsp-ui")
+             :after lsp-mode
 	     :config
 	     (lsp-ui-peek-enable 1)
-	     (lsp-ui-peek-show-directory 1)
+	     ;(lsp-ui-peek-show-directory 1)
 	     (lsp-ui-doc-enable 1)
 	     :commands lsp-ui-mode)
 (use-package helm-lsp
 	     :ensure t
+             :after lsp-mode
 	     :commands helm-lsp-workspace-symbol)
+(use-package flycheck
+             :after lsp-mode
+	     :ensure t)
+(use-package lsp-treemacs
+             :after lsp-mode
+             :commands lsp-treemacs-errors-list
+	     :ensure t)
 (use-package dap-mode
+             :after lsp-mode
 	     :ensure t)
 (use-package which-key
 	     :config
@@ -91,6 +116,7 @@
 (use-package company-math)
 (add-to-list 'company-backends 'company-math-symbols-unicode)
 (use-package yasnippet
+  :hook ((lsp-mode . yas-minor-mode))
   :ensure t)
 (use-package yasnippet-snippets
   :ensure t)
@@ -109,22 +135,17 @@
   :ensure t
   :after vimish-fold
   :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
-(quelpa
-  '(lsp-julia
-     :fetcher github
-     :repo "non-Jedi/lsp-julia"
-     :files (:defaults "languageserver")))
-(use-package lsp-mode
-	     :hook
-;             ((sh-mode . lsp))
-	     ((lsp-mode . lsp-enable-which-key-integration))
-	     :commands lsp)
-(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
-(add-hook 'dap-stopped-hook
-	  (lambda (arg) (call-interactively #'dap-hydra)))
-(setq dap-auto-configure-features '(sessions locals controls tooltip))
+;(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
+;(add-hook 'dap-stopped-hook
+;	  (lambda (arg) (call-interactively #'dap-hydra)))
+;(setq dap-auto-configure-features '(sessions locals controls tooltip))
+(add-hook 'julia-mode-hook #'lsp-mode)
 (with-eval-after-load 'lsp-mode
   ;; :project/:workspace/:file
   (setq lsp-diagnostics-modeline-scope :project)
   (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
-(lsp-mode t)
+(quelpa
+  '(lsp-julia
+     :fetcher github
+     :repo "gdkrmr/lsp-julia"
+     :files (:defaults "languageserver")))
