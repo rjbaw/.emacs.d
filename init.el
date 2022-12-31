@@ -1,27 +1,26 @@
-(emacs-init-time)
-(setq inhibit-startup-message t)
-(setq visible-bell 1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-;(scroll-bar-mode -1)
-(global-hl-line-mode t)
-(line-number-mode t)
-(visual-line-mode t)
-(setq-default indent-tabs-mode nil)
+(global-hl-line-mode 1)
+(global-visual-line-mode 1)
+;(setq scroll-bar-mode nil)
+(line-number-mode 1)
+(indent-tabs-mode 1)
 
+(setq inhibit-startup-message t)
+(setq visible-bell t)
 (setq default-frame-alist '((font . "DM Mono")))
 (setq custom-file "~/.emacs.d/custom-file.el")
 
 (setq exec-path (append exec-path '("/usr/bin")))
 (require 'package)
 (add-to-list 'package-archives
-	     '("melpa" . "http://melpa.org/packages/") t)
+             '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives
-	     '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
-	     '("org" . "http://orgmode.org/elpa/") t)
+             '("org" . "http://orgmode.org/elpa/") t)
 (add-to-list 'package-archives
-	     '("gnu" . "http://elpa.gnu.org/packages/") t)
+             '("gnu" . "http://elpa.gnu.org/packages/") t)
 (package-initialize)
 
 (unless (package-installed-p 'quelpa)
@@ -41,22 +40,23 @@
 	     :quelpa (spinner
 		       :fetcher github
 		       :repo "Malabarba/spinner.el"))
-(setq evil-want-C-i-jump nil)
 (use-package evil
-	     :ensure t
 	     :init
              (setq evil-undo-system 'undo-fu)
              (setq evil-want-integration t)
              (setq evil-want-keybinding nil)
              :config
-	     (evil-mode t))
+             (setq evil-want-C-i-jump nil)
+             (setq-default evil-escape-key-sequence "<ESC>")
+	     (evil-mode t)
+	     :ensure t)
 (use-package evil-collection
 	     :after evil
 	     :config
 	     (evil-collection-init)
 	     :ensure t)
-(setq-default evil-escape-key-sequence "<ESC>")
 (use-package org
+            :hook (org-mode . org-indent-mode)
             :ensure t)
 (use-package org-bullets
             :config
@@ -67,11 +67,18 @@
 (use-package go-mode)
 (use-package dockerfile-mode)
 (use-package docker-compose-mode)
+(use-package smartparens
+	    :config (smartparens-global-mode t))
+;(electric-pair-mode t)
+(use-package highlight-indent-guides
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (setq highlight-indent-guides-method 'character))
 (use-package spacemacs-common
-    :ensure spacemacs-theme
-    :config (load-theme 'spacemacs-dark t))
+	    :ensure spacemacs-theme
+	    :config (load-theme 'spacemacs-dark t))
 (use-package magit
-	     :ensure t)
+	    :ensure t)
 (use-package lsp-mode
              :init (setq lsp-keymap-prefix "C-c l")
 	     :hook
@@ -79,8 +86,7 @@
               (sh-mode . lsp)
               (lsp-mode . lsp-enable-which-key-integration)
               )
-	     :commands (lsp lsp-deferred)
-             :ensure t)
+	     :commands (lsp lsp-deferred))
 (use-package lsp-ui
 	     :quelpa (lsp-ui
 		       :fetcher github
@@ -116,36 +122,31 @@
 (use-package company-math)
 (add-to-list 'company-backends 'company-math-symbols-unicode)
 (use-package yasnippet
-  :hook ((lsp-mode . yas-minor-mode))
-  :ensure t)
+            :hook ((lsp-mode . yas-minor-mode))
+            :config (yas-global-mode 1)
+            :ensure t)
 (use-package yasnippet-snippets
-  :ensure t)
-(yas-global-mode 1)
+            :ensure t)
 (use-package spaceline
-  :demand t
-  :init
-  (setq powerline-default-separator 'arrow-fade)
-  :config
-  (require 'spaceline-config)
-  (spaceline-spacemacs-theme))
+	    :demand t
+	    :init
+	    (setq powerline-default-separator 'arrow-fade)
+	    :config
+	    (require 'spaceline-config)
+	    (spaceline-spacemacs-theme))
 (use-package vimish-fold
-  :ensure t
-  :after evil)
+            :ensure t
+            :after evil)
 (use-package evil-vimish-fold
-  :ensure t
-  :after vimish-fold
-  :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
-;(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
-;(add-hook 'dap-stopped-hook
-;	  (lambda (arg) (call-interactively #'dap-hydra)))
-;(setq dap-auto-configure-features '(sessions locals controls tooltip))
-(add-hook 'julia-mode-hook #'lsp-mode)
-(with-eval-after-load 'lsp-mode
-  ;; :project/:workspace/:file
-  (setq lsp-diagnostics-modeline-scope :project)
-  (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
-(quelpa
-  '(lsp-julia
-     :fetcher github
-     :repo "gdkrmr/lsp-julia"
-     :files (:defaults "languageserver")))
+            :ensure t
+            :after vimish-fold
+            :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
+(use-package lsp-julia
+	     :quelpa (lsp-julia
+		       :fetcher github
+		       :repo "gdkrmr/lsp-julia"
+                       :files (:defaults "languageserver")))
+;(with-eval-after-load 'lsp-mode
+;  ;; :project/:workspace/:file
+;  (setq lsp-diagnostics-modeline-scope :project)
+;  (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
