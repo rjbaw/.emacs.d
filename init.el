@@ -2,14 +2,21 @@
 (menu-bar-mode -1)
 (global-hl-line-mode 1)
 (global-visual-line-mode 1)
-;(setq scroll-bar-mode nil)
 (line-number-mode 1)
-(indent-tabs-mode 1)
+(electric-pair-mode 1)
+;(setq scroll-bar-mode nil)
+(setq indent-tabs-mode nil)
 
 (setq inhibit-startup-message t)
 (setq visible-bell t)
-(setq default-frame-alist '((font . "DM Mono")))
+(cond
+ ((find-font (font-spec :name "DM Mono"))
+  (set-frame-font "DM Mono"))
+ )
+;(setq default-frame-alist '((font . "DM Mono")))
 (setq custom-file "~/.emacs.d/custom-file.el")
+
+(define-key key-translation-map (kbd "ESC <escape>") (kbd "<escape>"))
 
 (setq exec-path (append exec-path '("/usr/bin")))
 (require 'package)
@@ -21,13 +28,14 @@
              '("org" . "http://orgmode.org/elpa/") t)
 (add-to-list 'package-archives
              '("gnu" . "http://elpa.gnu.org/packages/") t)
-(package-initialize)
 
-(unless (package-installed-p 'quelpa)
-  (with-temp-buffer
-    (url-insert-file-contents "https://github.com/quelpa/quelpa/raw/master/quelpa.el")
-    (eval-buffer)
-    (quelpa-self-upgrade)))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile
+  (require 'use-package))
+(use-package quelpa
+	    :ensure t)
 (quelpa
   '(quelpa-use-package
      :fetcher git
@@ -67,9 +75,8 @@
 (use-package go-mode)
 (use-package dockerfile-mode)
 (use-package docker-compose-mode)
-(use-package smartparens
-	    :config (smartparens-global-mode t))
-;(electric-pair-mode t)
+;(use-package smartparens
+;	    :config (smartparens-global-mode t))
 (use-package highlight-indent-guides
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
