@@ -16,8 +16,6 @@
 ;(setq default-frame-alist '((font . "DM Mono")))
 (setq custom-file "~/.emacs.d/custom-file.el")
 
-(define-key key-translation-map (kbd "ESC <escape>") (kbd "<escape>"))
-
 (setq exec-path (append exec-path '("/usr/bin")))
 (require 'package)
 (add-to-list 'package-archives
@@ -48,14 +46,20 @@
 	     :quelpa (spinner
 		       :fetcher github
 		       :repo "Malabarba/spinner.el"))
+(use-package key-chord
+             :config
+             (key-chord-define evil-insert-state-map "yy" 'evil-normal-state)
+	     :hook (evil-mode . key-chord-mode)
+             :ensure t)
 (use-package evil
 	     :init
-             (setq evil-undo-system 'undo-fu)
              (setq evil-want-integration t)
              (setq evil-want-keybinding nil)
              :config
              (setq evil-want-C-i-jump nil)
              (setq-default evil-escape-key-sequence "<ESC>")
+             (setq evil-undo-system 'undo-fu)
+	     (setq evil-esc-delay 0) ; check tmux conf
 	     (evil-mode t)
 	     :ensure t)
 (use-package evil-collection
