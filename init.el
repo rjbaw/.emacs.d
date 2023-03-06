@@ -55,11 +55,10 @@
 	     :init
              (setq evil-want-integration t)
              (setq evil-want-keybinding nil)
-             :config
-             (setq evil-want-C-i-jump nil)
-             (setq-default evil-escape-key-sequence "<ESC>")
              (setq evil-undo-system 'undo-fu)
+             (setq evil-want-C-i-jump nil)
 	     (setq evil-esc-delay 0) ; check tmux conf
+             :config
 	     (evil-mode t)
 	     :ensure t)
 (use-package evil-collection
