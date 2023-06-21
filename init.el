@@ -7,6 +7,7 @@
 ;(setq scroll-bar-mode nil)
 (setq indent-tabs-mode nil)
 
+(setq native-comp-async-report-warnings-errors nil)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
 (cond
@@ -56,7 +57,7 @@
              (setq evil-want-integration t)
              (setq evil-want-keybinding nil)
              (setq evil-undo-system 'undo-fu)
-             (setq evil-want-C-i-jump nil)
+             (setq evil-want-C-u-scroll t)
 	     (setq evil-esc-delay 0) ; check tmux conf
              :config
 	     (evil-mode t)
@@ -73,6 +74,7 @@
             :config
             (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 (use-package undo-fu)
+(use-package vterm)
 (use-package rust-mode)
 (use-package julia-mode)
 (use-package go-mode)
