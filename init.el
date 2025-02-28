@@ -1,12 +1,12 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(scroll-bar-mode -1)
 (global-hl-line-mode 1)
 (global-visual-line-mode 1)
 (line-number-mode 1)
+(setq display-line-numbers-type 'relative)
 (electric-pair-mode 1)
-;(setq scroll-bar-mode nil)
 (setq indent-tabs-mode nil)
-
 (setq native-comp-async-report-warnings-errors nil)
 (setq inhibit-startup-message t)
 (setq visible-bell t)
@@ -14,151 +14,174 @@
  ((find-font (font-spec :name "DM Mono"))
   (set-frame-font "DM Mono"))
  )
-;(setq default-frame-alist '((font . "DM Mono")))
-(setq custom-file "~/.emacs.d/custom-file.el")
 
+(setq custom-file "~/.emacs.d/custom-file.el")
 (setq exec-path (append exec-path '("/usr/bin")))
+
+;; Removed the unnecessary `package-initialize` call
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("org" . "http://orgmode.org/elpa/") t)
-(add-to-list 'package-archives
-             '("gnu" . "http://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 (eval-when-compile
   (require 'use-package))
-(use-package quelpa
-	    :ensure t)
-(quelpa
-  '(quelpa-use-package
-     :fetcher git
-     :url "https://github.com/quelpa/quelpa-use-package.git"))
-(require 'quelpa-use-package)
-;(setq use-package-ensure-function 'quelpa)
 (setq use-package-always-ensure t)
 
-(use-package spinner
-	     :quelpa (spinner
-		       :fetcher github
-		       :repo "Malabarba/spinner.el"))
+(use-package spinner)
 (use-package key-chord
-             :config
-             (key-chord-define evil-insert-state-map "yy" 'evil-normal-state)
-	     :hook (evil-mode . key-chord-mode)
-             :ensure t)
+  :config
+  (key-chord-define evil-insert-state-map "yy" 'evil-normal-state)
+  :hook (evil-mode . key-chord-mode))
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode)
+  (global-set-key (kbd "C-x u") 'undo-tree-visualize)
+  (setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo" user-emacs-directory)))))
+
 (use-package evil
-	     :init
-             (setq evil-want-integration t)
-             (setq evil-want-keybinding nil)
-             (setq evil-undo-system 'undo-fu)
-             (setq evil-want-C-u-scroll t)
-	     (setq evil-esc-delay 0) ; check tmux conf
-             :config
-	     (evil-mode t)
-	     :ensure t)
+  :init
+  (setq evil-want-integration t
+        evil-want-keybinding nil
+        evil-undo-system 'undo-tree
+        evil-want-C-u-scroll t
+        evil-esc-delay 0)
+  :config
+  (evil-mode t)
+  (define-key evil-normal-state-map "\C-v" 'evil-visual-block)
+  (define-key evil-normal-state-map "u" 'undo-tree-undo)
+  (define-key evil-normal-state-map (kbd "C-r") 'undo-tree-redo))
+
 (use-package evil-collection
-	     :after evil
-	     :config
-	     (evil-collection-init)
-	     :ensure t)
+  :after evil
+  :config
+  (evil-collection-init))
+
 (use-package org
-            :hook (org-mode . org-indent-mode)
-            :ensure t)
+  :hook (org-mode . org-indent-mode))
+
 (use-package org-bullets
-            :config
-            (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-(use-package undo-fu)
-(use-package vterm)
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
 (use-package rust-mode)
 (use-package julia-mode)
 (use-package go-mode)
 (use-package dockerfile-mode)
 (use-package docker-compose-mode)
-;(use-package smartparens
-;	    :config (smartparens-global-mode t))
+
+(use-package smartparens
+  :config (smartparens-global-mode t))
+
 (use-package highlight-indent-guides
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   (setq highlight-indent-guides-method 'character))
-(use-package spacemacs-common
-	    :ensure spacemacs-theme
-	    :config (load-theme 'spacemacs-dark t))
-(use-package magit
-	    :ensure t)
-(use-package lsp-mode
-             :init (setq lsp-keymap-prefix "C-c l")
-	     :hook
-             (
-              (sh-mode . lsp)
-              (lsp-mode . lsp-enable-which-key-integration)
-              )
-	     :commands (lsp lsp-deferred))
-(use-package lsp-ui
-	     :quelpa (lsp-ui
-		       :fetcher github
-		       :repo "emacs-lsp/lsp-ui")
-             :after lsp-mode
-	     :config
-	     (lsp-ui-peek-enable 1)
-	     ;(lsp-ui-peek-show-directory 1)
-	     (lsp-ui-doc-enable 1)
-	     :commands lsp-ui-mode)
-(use-package helm-lsp
-	     :ensure t
-             :after lsp-mode
-	     :commands helm-lsp-workspace-symbol)
-(use-package flycheck
-             :after lsp-mode
-	     :ensure t)
-(use-package lsp-treemacs
-             :after lsp-mode
-             :commands lsp-treemacs-errors-list
-	     :ensure t)
-(use-package dap-mode
-             :after lsp-mode
-	     :ensure t)
+
+(use-package spacemacs-theme
+  :defer t
+  :init (load-theme 'spacemacs-dark t))
+
+(use-package magit)
+
+(use-package eglot
+  :hook
+  ((prog-mode . eglot-ensure)
+   (org-mode . eglot-ensure))
+  :config
+  ;; Ensure language server is available for eglot before initializing
+  (add-hook 'eglot-managed-mode-hook (lambda ()
+                                       (unless (eglot--process-live-p)
+                                         (message "Eglot server not running!")))))
+
 (use-package which-key
-	     :config
-	     (which-key-mode))
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 0.3))
+
 (use-package company
-	     :config
-	     (setq company-idle-delay 0.0)
-	     (setq company-minimum-prefix-length 1)
-	     (global-company-mode t))
+  :config
+  (setq company-idle-delay 0.0
+        company-minimum-prefix-length 1)
+  (global-company-mode t))
+
 (use-package company-math)
 (add-to-list 'company-backends 'company-math-symbols-unicode)
+
 (use-package yasnippet
-            :hook ((lsp-mode . yas-minor-mode))
-            :config (yas-global-mode 1)
-            :ensure t)
-(use-package yasnippet-snippets
-            :ensure t)
+  :hook ((eglot . yas-minor-mode))
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets)
+
 (use-package spaceline
-	    :demand t
-	    :init
-	    (setq powerline-default-separator 'arrow-fade)
-	    :config
-	    (require 'spaceline-config)
-	    (spaceline-spacemacs-theme))
+  :demand t
+  :init
+  (setq powerline-default-separator 'arrow-fade)
+  :config
+  (require 'spaceline-config)
+  (spaceline-spacemacs-theme))
+
 (use-package vimish-fold
-            :ensure t
-            :after evil)
+  :after evil)
+
 (use-package evil-vimish-fold
-            :ensure t
-            :after vimish-fold
-            :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
-(use-package lsp-julia
-	     :quelpa (lsp-julia
-		       :fetcher github
-		       :repo "gdkrmr/lsp-julia"
-                       :files (:defaults "languageserver")))
-;(with-eval-after-load 'lsp-mode
-;  ;; :project/:workspace/:file
-;  (setq lsp-diagnostics-modeline-scope :project)
-;  (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
+  :after vimish-fold
+  :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
+
+(use-package projectile
+  :config
+  (projectile-mode +1)
+  (setq projectile-completion-system 'helm))
+
+(use-package counsel
+  :after (helm)
+  :config
+  (use-package swiper
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)))  
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x f" . counsel-find-file)))
+
+(use-package flycheck
+  :hook (prog-mode . flycheck-mode))
+
+(use-package lsp-mode
+  :hook ((rust-mode . lsp)
+         (go-mode . lsp)
+         (python-mode . lsp))
+  :commands lsp)
+
+(use-package lsp-ui
+  :after lsp-mode
+  :config
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-peek-enable t))
+
+(use-package treemacs
+  :config
+  (setq treemacs-width 30)
+  (treemacs-project-follow-mode))
+
+(use-package all-the-icons)
+
+(use-package beacon
+  :config
+  (beacon-mode 1))
+
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
+(use-package ace-window
+  :bind ("M-o" . ace-window))
+
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-interval 7
+        auto-package-update-prompt-before-update t)
+  (auto-package-update-maybe))
