@@ -20,7 +20,7 @@
 
 ;; Removed the unnecessary `package-initialize` call
 (require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 
 (unless (package-installed-p 'use-package)
@@ -105,8 +105,11 @@
 (use-package company
   :config
   (setq company-idle-delay 0.0
-        company-minimum-prefix-length 1)
-  (global-company-mode t))
+        company-minimum-prefix-length 1
+        company-selection-wrap-around t)
+  (global-company-mode t)
+  (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-selection))
 
 (use-package company-math)
 (add-to-list 'company-backends 'company-math-symbols-unicode)
